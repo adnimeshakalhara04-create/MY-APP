@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="si">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>ET Flash Cards — Print Studio</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="hero no-print">
+      <div>
+        <p class="eyebrow">ENGINEERING TECHNOLOGY • REVISION CARDS</p>
+        <h1>ET Flash Cards <span>Print Studio</span></h1>
+        <p class="hero-copy">පාඩමෙන් පාඩමට වර්ණ කේතනය කරපු, අංකනය කරපු, A4 print-ready revision cards.</p>
+      </div>
+      <div class="hero-badge" aria-label="Current card count">
+        <strong id="heroCount">0</strong>
+        <span>cards ready</span>
+      </div>
+    </header>
+
+    <section class="toolbar no-print" aria-label="Flash card controls">
+      <label>
+        <span>Unit</span>
+        <select id="unitSelect"></select>
+      </label>
+      <label>
+        <span>Print side</span>
+        <select id="sideSelect">
+          <option value="both">Front + Back</option>
+          <option value="front">Front only</option>
+          <option value="back">Back only</option>
+        </select>
+      </label>
+      <label class="search-wrap">
+        <span>Search</span>
+        <input id="searchInput" type="search" placeholder="ප්‍රශ්නයක් හෝ වචනයක් සොයන්න…" />
+      </label>
+      <button id="printBtn" class="primary-btn" type="button">🖨️ Print A4 Cards</button>
+    </section>
+
+    <section class="unit-summary no-print" id="unitSummary"></section>
+
+    <section class="legend no-print">
+      <div><span class="dot front-dot"></span> Front — ප්‍රශ්නය</div>
+      <div><span class="dot back-dot"></span> Back — පිළිතුර</div>
+      <div class="tip">Tip: duplex print කරනවා නම් “flip on long edge” භාවිතා කරන්න.</div>
+    </section>
+
+    <section id="cardGrid" class="card-grid" aria-live="polite"></section>
+    <p id="emptyState" class="empty-state no-print" hidden>මෙම search එකට cards හමු නොවීය.</p>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
