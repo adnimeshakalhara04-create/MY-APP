@@ -7,13 +7,13 @@
   <title>ET Flash Cards — Print Studio</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body data-print-side="both">
   <main class="app-shell">
     <header class="hero no-print">
       <div>
         <p class="eyebrow">ENGINEERING TECHNOLOGY • REVISION CARDS</p>
         <h1>ET Flash Cards <span>Print Studio</span></h1>
-        <p class="hero-copy">පාඩමෙන් පාඩමට වර්ණ කේතනය කරපු, අංකනය කරපු, A4 print-ready revision cards.</p>
+        <p class="hero-copy">කුඩා physical flash cards ලෙස print කරන්න. Unit එකෙන් Unit එකට වෙනම පාටක්, හැම card එකකටම Unit badge + sequence ID.</p>
       </div>
       <div class="hero-badge" aria-label="Current card count">
         <strong id="heroCount">0</strong>
@@ -27,18 +27,33 @@
         <select id="unitSelect"></select>
       </label>
       <label>
+        <span>Card size</span>
+        <select id="sizePreset">
+          <option value="small">Small — 70 × 45 mm</option>
+          <option value="medium" selected>Medium — 85 × 55 mm</option>
+          <option value="large">Large — 100 × 65 mm</option>
+          <option value="custom">Custom size</option>
+        </select>
+      </label>
+      <label>
         <span>Print side</span>
         <select id="sideSelect">
-          <option value="both">Front + Back</option>
-          <option value="front">Front only</option>
-          <option value="back">Back only</option>
+          <option value="both">Question + Answer</option>
+          <option value="front">Question only</option>
+          <option value="back">Answer only</option>
         </select>
       </label>
       <label class="search-wrap">
         <span>Search</span>
         <input id="searchInput" type="search" placeholder="ප්‍රශ්නයක් හෝ වචනයක් සොයන්න…" />
       </label>
-      <button id="printBtn" class="primary-btn" type="button">🖨️ Print A4 Cards</button>
+      <button id="printBtn" class="primary-btn" type="button">🖨️ Print Cards</button>
+    </section>
+
+    <section id="customSize" class="custom-size no-print" hidden>
+      <label><span>Width (mm)</span><input id="cardWidth" type="number" min="55" max="120" step="1" value="85" /></label>
+      <label><span>Height (mm)</span><input id="cardHeight" type="number" min="35" max="90" step="1" value="55" /></label>
+      <p>Size එක වෙනස් කළාම A4 sheet එකට fit වෙන columns/rows browser එකෙන් auto-arrange වෙනවා.</p>
     </section>
 
     <section class="unit-summary no-print" id="unitSummary"></section>
@@ -46,7 +61,7 @@
     <section class="legend no-print">
       <div><span class="dot front-dot"></span> Front — ප්‍රශ්නය</div>
       <div><span class="dot back-dot"></span> Back — පිළිතුර</div>
-      <div class="tip">Tip: duplex print කරනවා නම් “flip on long edge” භාවිතා කරන්න.</div>
+      <div class="tip">Cut line border එක card එක වටේ print වෙනවා.</div>
     </section>
 
     <section id="cardGrid" class="card-grid" aria-live="polite"></section>
