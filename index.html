@@ -13,7 +13,7 @@
       <div>
         <p class="eyebrow">ENGINEERING TECHNOLOGY • REVISION CARDS</p>
         <h1>ET Flash Cards <span>Print Studio</span></h1>
-        <p class="hero-copy">කුඩා physical flash cards ලෙස print කරන්න. Unit එකෙන් Unit එකට වෙනම පාටක්, හැම card එකකටම Unit badge + sequence ID.</p>
+        <p class="hero-copy">Side A එකට questions, ඒම A4 කොලේ Side B එකට matching answers. Back side එක mirror කරලා print වෙන නිසා cut කළාම එකම ID එකේ question + answer දෙපැත්තට align වේ.</p>
       </div>
       <div class="hero-badge" aria-label="Current card count">
         <strong id="heroCount">0</strong>
@@ -38,16 +38,16 @@
       <label>
         <span>Print side</span>
         <select id="sideSelect">
-          <option value="both">Question + Answer</option>
-          <option value="front">Question only</option>
-          <option value="back">Answer only</option>
+          <option value="front">Side A — Questions</option>
+          <option value="back">Side B — Answers (mirrored)</option>
+          <option value="both">Preview — Question + Answer</option>
         </select>
       </label>
       <label class="search-wrap">
         <span>Search</span>
         <input id="searchInput" type="search" placeholder="ප්‍රශ්නයක් හෝ වචනයක් සොයන්න…" />
       </label>
-      <button id="printBtn" class="primary-btn" type="button">🖨️ Print Cards</button>
+      <button id="printBtn" class="primary-btn" type="button">🖨️ Print Selected Side</button>
     </section>
 
     <section id="customSize" class="custom-size no-print" hidden>
@@ -59,9 +59,9 @@
     <section class="unit-summary no-print" id="unitSummary"></section>
 
     <section class="legend no-print">
-      <div><span class="dot front-dot"></span> Front — ප්‍රශ්නය</div>
-      <div><span class="dot back-dot"></span> Back — පිළිතුර</div>
-      <div class="tip">Cut line border එක card එක වටේ print වෙනවා.</div>
+      <div><span class="dot front-dot"></span> Step 1 — Side A Questions print කරන්න</div>
+      <div><span class="dot back-dot"></span> Step 2 — ඒම කොලය ආපසු දාලා Side B Answers print කරන්න</div>
+      <div class="tip">Printer setting: A4 Portrait • Actual size / 100% • Flip on long edge</div>
     </section>
 
     <section id="cardGrid" class="card-grid" aria-live="polite"></section>
