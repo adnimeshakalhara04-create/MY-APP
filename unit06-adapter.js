@@ -1,6 +1,6 @@
 (()=>{
   const nativeFetch=window.fetch.bind(window);
-  const DATA_BASE='https://cdn.jsdelivr.net/gh/adnimeshakalhara04-create/MY-APP@main';
+  const DATA_BASE='https://raw.githubusercontent.com/adnimeshakalhara04-create/MY-APP/2a0714771c1d29dbd5a49b14ec60468e2ee06809';
   const CHUNKS=['unit06-1.json','unit06-2.json','unit06-3.json','unit06-4.json','unit06-5.json'];
 
   function openDb(name,version,createStore=false){
