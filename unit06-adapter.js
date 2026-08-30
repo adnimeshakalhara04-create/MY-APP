@@ -3,6 +3,52 @@
   const DATA_BASE='https://raw.githubusercontent.com/adnimeshakalhara04-create/MY-APP/2a0714771c1d29dbd5a49b14ec60468e2ee06809';
   const CHUNKS=['unit06-1.json','unit06-2.json','unit06-3.json','unit06-4.json','unit06-5.json'];
 
+  // Exact image-card IDs and 9-section grouping from the latest ET වැඩක් ලබාදීම Unit 05 app.
+  const UNIT05_IMAGE_IDS=new Set([
+    '05-012','05-013','05-014','05-015','05-016','05-017','05-018','05-019','05-020','05-021','05-022','05-023','05-024','05-025','05-026',
+    '05-032','05-033','05-036','05-037','05-038','05-042','05-043','05-045','05-046','05-047','05-050','05-051','05-053','05-054','05-055','05-056','05-057',
+    '05-059','05-060','05-062','05-064','05-070','05-071','05-075','05-081','05-084','05-085','05-089','05-092','05-093','05-094','05-107','05-109',
+    '05-110','05-111','05-116','05-125'
+  ]);
+
+  function unit05Section(id){
+    const n=Number(String(id).split('-')[1]);
+    if(n<=26)return '5.1 චලිත';
+    if(n<=38)return 'Cam';
+    if(n<=47)return 'Rack & Pinion';
+    if(n<=56)return 'Screw Thread';
+    if(n<=60)return 'Slider Crank';
+    if(n<=69)return 'Power Transmission';
+    if(n<=93)return 'Belt Drives';
+    if(n<=108)return 'Belt Calculations';
+    return 'Chain & Sprocket';
+  }
+
+  function parseUnit05Source(src){
+    const s=src.indexOf('const units=');
+    let e=src.indexOf('\n\nconst $=',s);
+    if(e<0)e=src.indexOf('const $=',s);
+    if(s<0||e<0)throw new Error('Unit 05 dataset marker not found');
+    const expr=src.slice(s+'const units='.length,e).trim().replace(/;$/,'');
+    const units=Function('"use strict";return ('+expr+');')();
+    const sourceUnit=units.find(x=>String(x.id)==='05')||units[0];
+    if(!sourceUnit||!Array.isArray(sourceUnit.cards))throw new Error('Unit 05 source bank missing');
+    const cards=sourceUnit.cards.map((c,i)=>{
+      const id='05-'+String(i+1).padStart(3,'0');
+      const q=Array.isArray(c)?String(c[0]??''):String(c.q??c.question??'');
+      const a=Array.isArray(c)?String(c[1]??''):String(c.a??c.answer??'');
+      return {id,baseId:id,q,a,section:unit05Section(id),image:UNIT05_IMAGE_IDS.has(id),part:1,parts:1};
+    }).filter(c=>c.q||c.a);
+    const sections=new Set(cards.map(c=>c.section));
+    const imageSlots=cards.filter(c=>c.image).length;
+    if(cards.length!==125||sections.size!==9||imageSlots!==52){
+      throw new Error(`Unit 05 source integrity failed: cards=${cards.length}, sections=${sections.size}, images=${imageSlots}`);
+    }
+    window.ET_UNIT05_CARDS=cards;
+    window.ET_UNIT05_STATS={cards:125,sections:9,imageSlots:52,source:'ET වැඩක් ලබාදීම latest app'};
+    return [{...sourceUnit,cards}];
+  }
+
   function openDb(name,version,createStore=false){
     return new Promise(resolve=>{
       if(!('indexedDB' in window)){resolve(null);return}
@@ -67,6 +113,21 @@
 
   window.fetch=async(input,init)=>{
     const url=typeof input==='string'?input:(input&&input.url)||'';
+
+    if(/(^|\/)app\.js(?:\?|$)/.test(url)){
+      try{
+        const r=await nativeFetch(input,init);
+        if(!r.ok)return r;
+        const src=await r.text();
+        const units=parseUnit05Source(src);
+        const synthetic=`const units=${JSON.stringify(units)};\n\nconst $=null;`;
+        return new Response(synthetic,{status:200,headers:{'Content-Type':'application/javascript; charset=utf-8','X-ET-Source':'ET-work-chat-latest-Unit05'}});
+      }catch(err){
+        console.error('Unit 05 adapter failed',err);
+        return new Response('const units=[];\n\nconst $=null;',{status:500,headers:{'Content-Type':'application/javascript; charset=utf-8'}});
+      }
+    }
+
     if(/(^|\/)unit06\.json(?:\?|$)/.test(url)){
       try{
         const data=await loadUnit06();
