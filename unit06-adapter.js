@@ -1,6 +1,7 @@
 (()=>{
   const nativeFetch=window.fetch.bind(window);
-  const DATA_BASE='https://cdn.jsdelivr.net/gh/adnimeshakalhara04-create/MY-APP@0edcf0812ca54e73b839753a0dc9592a4d9ea84c/data';
+  const DATA_BASE='https://cdn.jsdelivr.net/gh/adnimeshakalhara04-create/MY-APP@main';
+  const CHUNKS=['unit06-1.json','unit06-2.json','unit06-3.json','unit06-4.json','unit06-5.json'];
 
   function openDb(name,version,createStore=false){
     return new Promise(resolve=>{
@@ -11,6 +12,7 @@
       req.onerror=()=>resolve(null);
     });
   }
+
   async function migrateLegacyImages(){
     try{
       if(!('indexedDB' in window))return;
@@ -45,20 +47,24 @@
   }
 
   async function loadUnit06(){
-    const chunks=await Promise.all([1,2,3,4].map(n=>nativeFetch(`${DATA_BASE}/unit06-${n}.json`,{cache:'force-cache'}).then(r=>{if(!r.ok)throw new Error(`Unit 06 chunk ${n}: ${r.status}`);return r.json()})));
-    const cards=[];
-    for(const data of chunks){
-      const sections=data.s||[];
-      for(const row of data.c||[]){
-        const [baseId,sectionIndex,q,image,answers]=row;
-        const parts=(answers||[]).length||1;
-        (answers||['']).forEach((a,i)=>cards.push({id:baseId,baseId,section:sections[sectionIndex]||'Unit 06',q,a,image:!!image,part:i+1,parts}));
-      }
+    const chunks=await Promise.all(CHUNKS.map(name=>nativeFetch(`${DATA_BASE}/${name}`,{cache:'no-store'}).then(r=>{
+      if(!r.ok)throw new Error(`${name}: ${r.status}`);
+      return r.json();
+    })));
+    const cards=chunks.flat();
+    const unique=new Set(cards.map(c=>c.baseId));
+    const imageParts=cards.filter(c=>c.image).length;
+    const textParts=cards.length-imageParts;
+    const imageSlots=new Set(cards.filter(c=>c.image).map(c=>c.baseId)).size;
+    if(cards.length!==425||unique.size!==364||textParts!==320||imageParts!==105||imageSlots!==60){
+      throw new Error(`Unit 06 source integrity failed: cards=${cards.length}, unique=${unique.size}, text=${textParts}, image=${imageParts}, slots=${imageSlots}`);
     }
     window.ET_UNIT06_CARDS=cards;
+    window.ET_UNIT06_STATS={cards:425,unique:364,text:320,image:105,imageSlots:60};
     await migrateLegacyImages();
     return {unit:'06',title:'ස්වයංචල තාක්ෂණවේදය',source:'index(5).html',cards};
   }
+
   window.fetch=async(input,init)=>{
     const url=typeof input==='string'?input:(input&&input.url)||'';
     if(/(^|\/)unit06\.json(?:\?|$)/.test(url)){
