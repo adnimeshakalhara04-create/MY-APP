@@ -1,73 +1,112 @@
 <!doctype html>
 <html lang="si">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="color-scheme" content="light dark" />
-  <title>ET Flash Cards — Print Studio</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#07152a">
+  <title>ET Recall — Engineering Technology</title>
+  <link rel="stylesheet" href="recall.css">
 </head>
-<body data-print-side="both">
-  <main class="app-shell">
-    <header class="hero no-print">
-      <div>
-        <p class="eyebrow">ENGINEERING TECHNOLOGY • REVISION CARDS</p>
-        <h1>ET Flash Cards <span>Print Studio</span></h1>
-        <p class="hero-copy">Side A එකට questions, ඒම A4 කොලේ Side B එකට matching answers. Back side එක mirror කරලා print වෙන නිසා cut කළාම එකම ID එකේ question + answer දෙපැත්තට align වේ.</p>
+<body>
+<main class="app">
+  <header class="hero surface no-print">
+    <div>
+      <div class="brand">
+        <div class="logo">ET⚙</div>
+        <div>
+          <div class="eyebrow">ඉංජිනේරු තාක්ෂණවේදය • ENGINEERING TECHNOLOGY</div>
+          <h1 id="heroTitle">ET <span>Recall</span></h1>
+          <p id="heroSub">A/L Engineering Technology revision system</p>
+        </div>
       </div>
-      <div class="hero-badge" aria-label="Current card count">
-        <strong id="heroCount">0</strong>
-        <span>cards ready</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:17px">
+        <button class="btn primary" id="continueBtn">▶ දිගටම</button>
+        <label class="field" style="min-width:210px"><span>Current Unit</span><select id="unitPicker"><option value="03">Unit 03</option><option value="05" selected>Unit 05</option><option value="06">Unit 06</option></select></label>
       </div>
-    </header>
+      <div class="stats">
+        <div class="stat"><span>CARDS LOADED</span><strong id="statCards">0</strong></div>
+        <div class="stat"><span>පුළුවන්</span><strong id="statGood">0</strong></div>
+        <div class="stat"><span>බැරි</span><strong id="statHard">0</strong></div>
+        <div class="stat"><span>IMAGE SLOTS</span><strong id="statImages">0</strong></div>
+      </div>
+    </div>
+    <div class="orb" id="orb" style="--p:0"><div><div><strong id="orbPct">0%</strong><span>REVIEWED</span></div></div></div>
+  </header>
 
-    <section class="toolbar no-print" aria-label="Flash card controls">
-      <label>
-        <span>Unit</span>
-        <select id="unitSelect"></select>
-      </label>
-      <label>
-        <span>Card size</span>
-        <select id="sizePreset">
-          <option value="small">Small — 70 × 45 mm</option>
-          <option value="medium" selected>Medium — 85 × 55 mm</option>
-          <option value="large">Large — 100 × 65 mm</option>
-          <option value="custom">Custom size</option>
-        </select>
-      </label>
-      <label>
-        <span>Print side</span>
-        <select id="sideSelect">
-          <option value="front">Side A — Questions</option>
-          <option value="back">Side B — Answers (mirrored)</option>
-          <option value="both">Preview — Question + Answer</option>
-        </select>
-      </label>
-      <label class="search-wrap">
-        <span>Search</span>
-        <input id="searchInput" type="search" placeholder="ප්‍රශ්නයක් හෝ වචනයක් සොයන්න…" />
-      </label>
-      <button id="printBtn" class="primary-btn" type="button">🖨️ Print Selected Side</button>
-    </section>
+  <nav class="tabs no-print" aria-label="ET Recall navigation">
+    <button class="tab active" data-view="home">🏠 Home</button>
+    <button class="tab" data-view="study">🧠 Study</button>
+    <button class="tab" data-view="browse">🗂️ Cards</button>
+    <button class="tab" data-view="images">🖼️ Images</button>
+    <button class="tab" data-view="print">🖨️ Print</button>
+  </nav>
 
-    <section id="customSize" class="custom-size no-print" hidden>
-      <label><span>Width (mm)</span><input id="cardWidth" type="number" min="55" max="120" step="1" value="85" /></label>
-      <label><span>Height (mm)</span><input id="cardHeight" type="number" min="35" max="90" step="1" value="55" /></label>
-      <p>Size එක වෙනස් කළාම A4 sheet එකට fit වෙන columns/rows browser එකෙන් auto-arrange වෙනවා.</p>
-    </section>
+  <section class="view" id="homeView">
+    <div class="section-head"><div><h2>පාඩම් ඒකක</h2></div><p>Unit එක වෙනස් කළාම theme, study progress, filters සහ print settings ඒ unit එකටම switch වේ.</p></div>
+    <div class="unit-grid" id="unitGrid"></div>
+    <div class="today surface"><div><h3>අද Recall තත්ත්වය</h3><p id="todayText"></p></div><div class="today-count"><strong id="todayCount">0</strong><span>TO REVIEW</span></div></div>
+  </section>
 
-    <section class="unit-summary no-print" id="unitSummary"></section>
+  <section class="view" id="studyView" hidden>
+    <div class="section-head"><div><h2>🧠 Recall Study</h2></div><p>Front එකෙන් උත්තරය මතක් කරලා card එක flip කරන්න. පසුව පුළුවන් / බැරි ලෙස වෙන් කරන්න.</p></div>
+    <div class="bank-warning" id="studyWarning" hidden></div>
+    <div class="focus-wrap" id="focusStage">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px"><button class="btn ghost" id="prevStudy">‹ Previous</button><span id="studyPos" style="font-size:11px;color:var(--muted);font-weight:900"></span><button class="btn ghost" id="nextStudy">Next ›</button></div>
+      <article class="focus-card" id="focusCard">
+        <div class="flip-inner">
+          <div class="face front"><div class="face-kicker">ප්‍රශ්නය • QUESTION</div><div id="focusImage" class="image-preview"></div><div class="focus-text focus-question" id="focusQ"></div><div class="focus-id" id="focusQId"></div></div>
+          <div class="face back"><div class="face-kicker">පිළිතුර • ANSWER</div><div class="focus-text focus-answer" id="focusA"></div><div class="focus-id" id="focusAId"></div></div>
+        </div>
+      </article>
+      <div class="study-actions"><button class="btn hard" id="hardBtn">✕ බැරි</button><button class="btn primary" id="flipBtn">↻ Flip Card</button><button class="btn ok" id="goodBtn">✓ පුළුවන්</button></div>
+    </div>
+  </section>
 
-    <section class="legend no-print">
-      <div><span class="dot front-dot"></span> Step 1 — Side A Questions print කරන්න</div>
-      <div><span class="dot back-dot"></span> Step 2 — ඒම කොලය ආපසු දාලා Side B Answers print කරන්න</div>
-      <div class="tip">Printer setting: A4 Portrait • Actual size / 100% • Flip on long edge</div>
-    </section>
+  <section class="view" id="browseView" hidden>
+    <div class="section-head"><div><h2>🗂️ Card Bank</h2><div id="browseCount" style="color:var(--muted);font-size:10px;margin-top:4px"></div></div><p>Question, answer, ID, section, status සහ card type අනුව filter කරන්න.</p></div>
+    <div class="toolbar no-print">
+      <label class="field"><span>Search</span><input class="input" id="browseSearch" placeholder="ප්‍රශ්නය / පිළිතුර / ID"></label>
+      <label class="field"><span>Section</span><select id="browseSection"><option value="">සියලුම කොටස්</option></select></label>
+      <label class="field"><span>Status</span><select id="browseStatus"><option value="">All status</option><option value="good">පුළුවන්</option><option value="hard">බැරි</option></select></label>
+      <label class="field"><span>Type</span><select id="browseKind"><option value="">All cards</option><option value="text">Text</option><option value="image">Image</option></select></label>
+    </div>
+    <div class="browse-grid" id="browseGrid"></div>
+  </section>
 
-    <section id="cardGrid" class="card-grid" aria-live="polite"></section>
-    <p id="emptyState" class="empty-state no-print" hidden>මෙම search එකට cards හමු නොවීය.</p>
-  </main>
+  <section class="view" id="imagesView" hidden>
+    <div class="section-head"><div><h2>🖼️ Image Card Manager</h2><div id="imageProgress" style="color:var(--muted);font-size:10px;margin-top:4px">Images: 0 / 0</div></div><p>Image card එකකට image එකක් upload කරලා browser එක තුළම save කරගන්න. Print editor එකෙන් crop/zoom/position වෙනස් කළ හැක.</p></div>
+    <div class="toolbar no-print">
+      <label class="field"><span>Search</span><input class="input" id="imageSearch" placeholder="Card ID / question"></label>
+      <label class="field"><span>Section</span><select id="imageSection"><option value="">සියලුම Image sections</option></select></label>
+      <label class="field"><span>Image state</span><select id="imageState"><option value="">All</option><option value="missing">Image නැති</option><option value="added">Image දාපු</option></select></label>
+    </div>
+    <div class="image-grid" id="imageGrid"></div>
+  </section>
 
-  <script src="app.js"></script>
+  <section class="view" id="printView" hidden>
+    <div class="section-head no-print"><div><h2>🖨️ A4 Print Studio</h2></div><p>A/B duplex alignment සඳහා answer side එක row-by-row mirror වේ. Print: A4 Portrait • Actual size / 100%.</p></div>
+    <div class="print-shell">
+      <aside class="controls no-print">
+        <h3>Print Controls</h3>
+        <label class="field"><span>Print set</span><select id="printSet"><option value="text">Text cards only</option><option value="image">Image cards only</option><option value="all">All cards</option></select></label>
+        <label class="field"><span>Section</span><select id="printSection"><option value="">සියලුම කොටස්</option></select></label>
+        <label class="field"><span>Side</span><select id="printSide"><option value="q">A — Questions</option><option value="a">B — Answers (mirrored)</option><option value="both">A + B Preview</option></select></label>
+        <div class="control-group"><div class="control-title">Global print text</div><div class="range-row"><span>Scale</span><input id="printScale" type="range" min="65" max="135" value="100"><output id="printScaleOut">100%</output></div><label class="check-row"><input id="autoFit" type="checkbox" checked> Auto-fit — text clipping නොවෙන්න</label></div>
+        <div class="control-group" id="individualEditor"><div class="control-title">Selected card — separate Q / A size</div><label class="field"><span>Card</span><select id="editCard"></select></label><div class="range-row"><span>Question</span><input id="qSize" type="range" min="55" max="150" value="100"><output id="qSizeOut">100%</output></div><div class="range-row"><span>Answer</span><input id="aSize" type="range" min="55" max="150" value="100"><output id="aSizeOut">100%</output></div><button class="btn ghost" id="resetSizes" style="width:100%">Reset Q/A sizes</button></div>
+        <div class="control-group image-editor" id="imageEditor" hidden><div class="control-title">Selected image print editor</div><label class="field"><span>Fit</span><select id="imgFit"><option value="contain">Contain</option><option value="cover">Cover</option><option value="fill">Fill</option></select></label><div class="range-row"><span>Zoom</span><input id="imgZoom" type="range" min="60" max="180" value="100"><output id="imgZoomOut">100%</output></div><div class="range-row"><span>X</span><input id="imgX" type="range" min="-60" max="60" value="0"><output id="imgXOut">0%</output></div><div class="range-row"><span>Y</span><input id="imgY" type="range" min="-60" max="60" value="0"><output id="imgYOut">0%</output></div><div class="range-row"><span>Image H</span><input id="imgH" type="range" min="30" max="96" value="78"><output id="imgHOut">78mm</output></div><label class="check-row"><input id="imgBorder" type="checkbox" checked> Image border</label><button class="btn ghost" id="resetImageEdit" style="width:100%;margin-top:8px">Reset image edit</button></div>
+        <button class="btn primary" id="printBtn" style="width:100%;margin-top:12px">🖨️ Print selected set</button>
+        <div class="summary" id="printSummary"></div>
+        <div class="hint">Text cards: 15 / A4 (3×5). Image mode: 6 / A4 (3×2). Individual Q/A size settings and image edits are saved locally.</div>
+      </aside>
+      <main class="a4wrap">
+        <div class="preview-dock no-print"><div class="pair-preview" id="pairPreview"></div></div>
+        <div class="pagebar no-print"><span id="pageLabel">Page 1 / 1</span><span><button class="btn ghost" id="prevPage">‹</button> <button class="btn ghost" id="nextPage">›</button></span></div>
+        <div class="a4-preview" id="preview"></div>
+      </main>
+    </div>
+  </section>
+</main>
+<script src="recall.js"></script>
 </body>
 </html>
