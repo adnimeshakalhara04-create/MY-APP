@@ -75,7 +75,13 @@
     const p=e.target.closest('#preview .pcard.question[data-card]');if(p)openEditor(p.dataset.card);
   });
 
-  const observer=new MutationObserver(()=>{ensureUI();sync();applyAll()});
+  let lastObservedId='';
+  const observer=new MutationObserver(()=>{
+    ensureUI();
+    const id=currentId();
+    if(id!==lastObservedId){lastObservedId=id;sync()}
+    applyAll();
+  });
   observer.observe(document.documentElement,{childList:true,subtree:true});
-  window.addEventListener('load',()=>{ensureUI();sync();applyAll()});
+  window.addEventListener('load',()=>{ensureUI();lastObservedId=currentId();sync();applyAll()});
 })();
